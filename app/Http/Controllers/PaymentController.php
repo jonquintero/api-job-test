@@ -39,7 +39,7 @@ class PaymentController extends Controller
         $response =  $this->upsert($request, new Payment());
 
             PaymentJob::dispatch($response);
-            return response('su pago esta siendo procesado le avisaremos mediante un email una vez terminado el proceso')
+            return response('Your payment is being processed we will notify you by email once the process is finished')
             ->setStatusCode(Response::HTTP_CREATED);
     }
 
