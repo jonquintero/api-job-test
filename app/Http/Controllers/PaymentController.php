@@ -11,6 +11,7 @@ use App\Actions\UpsertPaymentAction;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Request as RequestFacade;
 
@@ -20,6 +21,9 @@ class PaymentController extends Controller
     {
     }
 
+    /**
+     * @return AnonymousResourceCollection
+     */
     public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         return PaymentResource::collection( Payment::query()->with('client')
@@ -43,7 +47,12 @@ class PaymentController extends Controller
             ->setStatusCode(Response::HTTP_CREATED);
     }
 
-    private function upsert(UpsertPaymentRequest $request, Payment $payment)
+    /**
+     * @param UpsertPaymentRequest $request
+     * @param Payment $payment
+     * @return Payment
+     */
+    private function upsert(UpsertPaymentRequest $request, Payment $payment): Payment
     {
         $paymentData = PaymentData::fromRequest($request);
 
