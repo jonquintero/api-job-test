@@ -40,13 +40,24 @@ class PaymentJob implements ShouldQueue
             ->latest()
             ->first();
 
-        if(isset($searchLastPaymentToTheClient->payment_date)
-            &&  $searchLastPaymentToTheClient->payment_date == date('Y-m-d')
-            && $searchLastPaymentToTheClient->status == PaymentStatusEnum::PAID){
+        $rate = $this->getClpUsd($searchLastPaymentToTheClient);
 
+        $this->payment->payment_date = date('Y-m-d');
+        $this->payment->status = PaymentStatusEnum::PAID;
+        $this->payment->clp_usd = $rate;
+
+        $this->payment->save();
+
+    }
+
+
+    public function getClpUsd($searchLastPaymentToTheClient): mixed
+    {
+        if (isset($searchLastPaymentToTheClient->payment_date)
+            && $searchLastPaymentToTheClient->payment_date == date('Y-m-d')
+            && $searchLastPaymentToTheClient->status == PaymentStatusEnum::PAID) {
             $rate = $searchLastPaymentToTheClient->clp_usd;
-        }else{
-
+        } else {
             /*
              * IT CAN PERFECTLY WORK THIS WAY
              * Http::get(config('services.rate.url'))->collect('serie.0')
@@ -56,16 +67,10 @@ class PaymentJob implements ShouldQueue
 
             $getRates = Http::get(config('services.rate.url'))->collect('serie');
 
-            $rate = $getRates->where('fecha', '=', date('Y-m-d').'T03:00:00.000Z')
+            $rate = $getRates->where('fecha', '=', date('Y-m-d') . 'T03:00:00.000Z')
                 ->flatten(0)
                 ->get(1);
         }
-
-        $this->payment->payment_date = date('Y-m-d');
-        $this->payment->status = PaymentStatusEnum::PAID;
-        $this->payment->clp_usd = $rate;
-
-        $this->payment->save();
-
+        return $rate;
     }
 }
