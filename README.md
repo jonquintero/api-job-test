@@ -51,3 +51,29 @@ Run the dev server (the output will give the address):
 php artisan serve
 ```
 
+The endpoints uses:
+
+```sh
+GET /api/clients
+GET /api/payments?client={uuid string}
+```
+To storage payments:
+
+```sh
+POST /api/payments
+```
+Body request example:
+
+```sh
+{
+    "expires_at": "2022-10-18",
+    "client_id": "7c037720-9597-46db-adbe-d300827f14bf"
+}
+```
+
+To run job:
+```sh
+ php artisan queue:listen --timeout=0
+```
+
+
